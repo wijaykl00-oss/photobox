@@ -332,7 +332,7 @@ export default function App() {
               <img 
                 src={blobbyFrameImg} 
                 alt="Blobby Frame" 
-                className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-10 scale-[3] filter drop-shadow-sm" 
+                className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-10 scale-[3.5] filter drop-shadow-sm" 
               />
             )}
           </div>
