@@ -255,7 +255,9 @@ export default function App() {
       layout
       initial={isReviewing ? { opacity: 0, y: 50 } : false}
       animate={{ opacity: 1, y: 0 }}
-      className={`shadow-2xl flex flex-col mx-auto relative overflow-hidden transition-all ${
+      className={`shadow-2xl flex flex-col mx-auto relative transition-all ${
+        frameStyle === 'blobby' ? 'overflow-visible' : 'overflow-hidden'
+      } ${
         frameStyle === 'blobby'
           ? (isReviewing ? 'w-[320px] sm:w-[360px]' : 'w-[250px] sm:w-[270px]')
           : (isReviewing ? 'w-[300px] sm:w-[340px]' : 'w-[240px] sm:w-[260px]')
@@ -330,7 +332,7 @@ export default function App() {
               <img 
                 src={blobbyFrameImg} 
                 alt="Blobby Frame" 
-                className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-10 scale-[2] filter drop-shadow-sm" 
+                className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-10 scale-[3] filter drop-shadow-sm" 
               />
             )}
           </div>
