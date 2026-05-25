@@ -11,16 +11,16 @@ import hantuKameraImg from '@/item/Hantukamera.png';
 import blobbyFrameImg from '@/item/The Blobby Frame.png';
 
 const STRIP_COLORS = [
-  { name: 'Dark', hex: '#18181b', text: '#ffffff' },
-  { name: 'Light', hex: '#ffffff', text: '#18181b' },
-  { name: 'Rose', hex: '#ffe4e6', text: '#881337' },
-  { name: 'Ice', hex: '#e0f2fe', text: '#0c4a6e' },
+  { name: 'Gelap', hex: '#18181b', text: '#ffffff' },
+  { name: 'Terang', hex: '#ffffff', text: '#18181b' },
+  { name: 'Mawar', hex: '#ffe4e6', text: '#881337' },
+  { name: 'Es', hex: '#e0f2fe', text: '#0c4a6e' },
   { name: 'Lavender', hex: '#f3e8ff', text: '#581c87' },
-  { name: 'Mint Candy', hex: '#d3f9d8', text: '#2b8a3e' },
+  { name: 'Permen Mint', hex: '#d3f9d8', text: '#2b8a3e' },
   { name: 'Lemon Chiffon', hex: '#fff3bf', text: '#d9480f' },
-  { name: 'Peach Punch', hex: '#ffe3e3', text: '#c92a2a' },
-  { name: 'Bubblegum', hex: 'linear-gradient(to bottom, #ffc9c9, #decbe4)', text: '#862e9c' },
-  { name: 'Sunset Kiss', hex: 'linear-gradient(to bottom, #ffe3e3, #ffd8a8)', text: '#d9480f' },
+  { name: 'Permen Persik', hex: '#ffe3e3', text: '#c92a2a' },
+  { name: 'Permen Karet', hex: 'linear-gradient(to bottom, #ffc9c9, #decbe4)', text: '#862e9c' },
+  { name: 'Senja Manis', hex: 'linear-gradient(to bottom, #ffe3e3, #ffd8a8)', text: '#d9480f' },
   { name: 'Blobby Jelly', hex: 'linear-gradient(to bottom, #d7fdec, #ffebf0)', text: '#86198f', isBlobby: true }
 ];
 
@@ -317,7 +317,7 @@ export default function App() {
             {/* The photo, rounded at the corners underneath the Blobby Frame */}
             <div className="w-full h-full overflow-hidden rounded-[8px]">
               {photos[i] ? (
-                <img src={photos[i]} alt={`Shot ${i+1}`} className="w-full h-full object-cover" />
+                <img src={photos[i]} alt={`Foto ${i+1}`} className="w-full h-full object-cover" />
               ) : (
                 <div className={`absolute inset-0 flex items-center justify-center font-medium ${
                   frameStyle === 'blobby' ? 'text-neutral-400 bg-neutral-200/50' : 'text-black/20'
@@ -488,7 +488,7 @@ export default function App() {
                       frameStyle === 'classic' ? 'bg-gradient-to-r from-cyan-500 to-violet-500 text-white shadow' : 'text-slate-400'
                     }`}
                   >
-                    🌸 Classic
+                    🌸 Klasik
                   </button>
                   <button
                     onClick={() => setFrameStyle('blobby')}
@@ -558,7 +558,7 @@ export default function App() {
             <div>
               <h2 className="font-display font-bold text-2xl text-white">Pratinjau</h2>
               <p className="text-slate-400 mt-1">
-                {frameStyle === 'blobby' ? 'Tipe Bingkai: Blobby Frame' : 'Pilih warna bingkai Anda'}
+                {frameStyle === 'blobby' ? 'Jenis Bingkai: Blobby Frame' : 'Pilih warna bingkai Anda'}
               </p>
             </div>
             {/* Color Pickers for Desktop */}
@@ -581,7 +581,7 @@ export default function App() {
 
           {/* Frame Style Selector */}
           <div className="mb-8 pointer-events-auto">
-            <h3 className="font-sans font-semibold text-xs text-slate-400 uppercase tracking-wider mb-2">Tipe Bingkai</h3>
+            <h3 className="font-sans font-semibold text-xs text-slate-400 uppercase tracking-wider mb-2">Jenis Bingkai</h3>
             <div className="flex gap-1.5 bg-slate-900/60 p-1 rounded-full border border-slate-800 text-center">
               <button
                 onClick={() => setFrameStyle('classic')}
@@ -589,7 +589,7 @@ export default function App() {
                   frameStyle === 'classic' ? 'bg-gradient-to-r from-cyan-500 to-violet-500 text-white shadow' : 'text-slate-400 hover:text-white'
                 }`}
               >
-                🌸 Classic
+                🌸 Klasik
               </button>
               <button
                 onClick={() => setFrameStyle('blobby')}
@@ -641,7 +641,7 @@ export default function App() {
                 onClick={() => { setMode('idle'); setPhotos([]); }}
                 className="flex-1 py-4 sm:py-5 rounded-full bg-slate-900 border border-slate-800 text-white font-medium flex items-center justify-center gap-2 hover:bg-slate-800 transition active:scale-95 cursor-pointer shadow-md"
               >
-                <RefreshCcw className="w-5 h-5 text-slate-400" /> Retake
+                <RefreshCcw className="w-5 h-5 text-slate-400" /> Foto Ulang
               </button>
               <button
                 onClick={handleDownload}
