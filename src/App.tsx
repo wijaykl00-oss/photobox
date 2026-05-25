@@ -255,7 +255,7 @@ export default function App() {
       animate={{ opacity: 1, y: 0 }}
       className={`shadow-2xl flex flex-col mx-auto relative overflow-hidden transition-all ${
         frameStyle === 'blobby'
-          ? (isReviewing ? 'w-[320px] sm:w-[360px]' : 'w-[250px] sm:w-[270px]')
+          ? (isReviewing ? 'w-[340px] sm:w-[380px]' : 'w-[270px] sm:w-[290px]')
           : (isReviewing ? 'w-[300px] sm:w-[340px]' : 'w-[240px] sm:w-[260px]')
       }`}
       style={{ background: stripColor.hex }}
@@ -300,7 +300,7 @@ export default function App() {
 
       <div className={`flex flex-col relative transition-all ${
         frameStyle === 'blobby'
-          ? (isReviewing ? 'p-7 sm:p-8 gap-5 pb-28 pt-10' : 'p-6 gap-4 pb-24 pt-8')
+          ? (isReviewing ? 'p-8 sm:p-10 gap-6 pb-32 pt-12' : 'p-7 gap-5 pb-26 pt-9')
           : (isReviewing ? 'p-6 gap-4 pb-24 pt-8' : 'p-5 gap-3 pb-20 pt-6')
       }`}>
         {[0, 1, 2, 3].map(i => (
@@ -328,7 +328,7 @@ export default function App() {
               <img 
                 src={blobbyFrameImg} 
                 alt="Blobby Frame" 
-                className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-10 scale-[1.04] filter drop-shadow-sm" 
+                className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-10 scale-[1.16] filter drop-shadow-sm" 
               />
             )}
           </div>
