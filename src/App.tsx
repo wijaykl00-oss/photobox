@@ -2,7 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Camera, Download, RefreshCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCamera } from './hooks/useCamera';
@@ -44,6 +44,7 @@ const Sticker = ({
   src?: string; 
   className?: string; 
   style?: React.CSSProperties; 
+  key?: React.Key;
 }) => {
   return (
     <motion.div
