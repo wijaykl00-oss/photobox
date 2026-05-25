@@ -73,129 +73,181 @@ export const downloadStrip = async (
   // 4:3 Aspect Ratio for photos
   const pxWidth = 600;
   const pxHeight = 450;
-  const paddingSide = frameStyle === 'blobby' ? 84 : 48;   // Wider side borders for blobby
-  const paddingTop = frameStyle === 'blobby' ? 84 : 48;    // Wider top border
-  const gap = frameStyle === 'blobby' ? 48 : 24;           // Gap between photos
-  const paddingBottom = frameStyle === 'blobby' ? 200 : 160; // Wider bottom border for text
 
-  canvas.width = pxWidth + (paddingSide * 2);
-  canvas.height = paddingTop + (pxHeight * 4) + (gap * 3) + paddingBottom;
+  if (frameStyle === 'blobby') {
+    canvas.width = 600;
+    canvas.height = 1440;
 
-  // Fill background with color or gradient (all styles now support color/gradient backgrounds!)
-  if (bgColor.includes('gradient') || bgColor.includes('linear-gradient') || bgColor.includes('#decbe4') || bgColor.includes('#ffd8a8') || bgColor.includes('#d7fdec')) {
-    const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    if (bgColor.includes('#decbe4') || bgColor.includes('bubblegum')) {
-      grad.addColorStop(0, '#ffc9c9');
-      grad.addColorStop(1, '#decbe4');
-    } else if (bgColor.includes('#ffd8a8') || bgColor.includes('sunset') || bgColor.includes('Sunset')) {
-      grad.addColorStop(0, '#ffe3e3');
-      grad.addColorStop(1, '#ffd8a8');
-    } else if (bgColor.includes('#d7fdec') || bgColor.includes('blobby') || bgColor.includes('Blobby')) {
-      grad.addColorStop(0, '#d7fdec');
-      grad.addColorStop(1, '#ffebf0');
-    } else {
-      grad.addColorStop(0, '#fbcfe8');
-      grad.addColorStop(1, '#cfe2ff');
-    }
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  } else {
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  }
-
-  // Draw photos iteratively
-  for (let i = 0; i < photos.length; i++) {
-    const img = new Image();
-    img.src = photos[i];
-    
-    await new Promise((resolve) => {
-      img.onload = resolve;
-      img.onerror = resolve; // Continue even if one fails
-    });
-    
-    const y = paddingTop + (i * pxHeight) + (i * gap);
-    ctx.drawImage(img, paddingSide, y, pxWidth, pxHeight);
-
-    // If frameStyle is blobby, draw the Blobby Frame image overlaying each photo slot
-    if (frameStyle === 'blobby') {
-      const frameImg = new Image();
-      frameImg.src = blobbyFrameImg;
+    // 1. Draw the captured photos (maximum 2) underneath the transparent slots
+    const numPhotos = Math.min(photos.length, 2);
+    for (let i = 0; i < numPhotos; i++) {
+      const img = new Image();
+      img.src = photos[i];
+      
       await new Promise((resolve) => {
-        frameImg.onload = resolve;
-        frameImg.onerror = resolve;
+        img.onload = resolve;
+        img.onerror = resolve;
       });
-      // Draw the Blobby Frame slightly larger (matching scale-[1.16] on-screen)
-      const scaleFactor = 1.16;
-      const fw = pxWidth * scaleFactor;
-      const fh = pxHeight * scaleFactor;
-      const fx = paddingSide - ((fw - pxWidth) / 2);
-      const fy = y - ((fh - pxHeight) / 2);
-      ctx.drawImage(frameImg, fx, fy, fw, fh);
+
+      // Photo slot percentage dimensions inside 600 x 1440 canvas
+      const x = 600 * 0.11;
+      const y = 1440 * (i === 0 ? 0.07 : 0.476);
+      const w = 600 * 0.78;
+      const h = 1440 * 0.32;
+      const radius = 42; // Matching the rounded corners on screen
+
+      ctx.save();
+      ctx.beginPath();
+      // RoundRect handles the rounded corners elegantly
+      ctx.roundRect(x, y, w, h, radius);
+      ctx.clip();
+
+      // Cover-crop calculation to preserve aspect ratio in canvas
+      const imgRatio = img.width / img.height;
+      const slotRatio = w / h;
+      let sx = 0, sy = 0, sw = img.width, sh = img.height;
+
+      if (imgRatio > slotRatio) {
+        sw = img.height * slotRatio;
+        sx = (img.width - sw) / 2;
+      } else {
+        sh = img.width / slotRatio;
+        sy = (img.height - sh) / 2;
+      }
+
+      ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+      ctx.restore();
+    }
+
+    // 2. Draw the full-bleed bingkai1.png template overlay on top
+    const frameImg = new Image();
+    frameImg.src = blobbyFrameImg;
+    await new Promise((resolve) => {
+      frameImg.onload = resolve;
+      frameImg.onerror = resolve;
+    });
+    ctx.drawImage(frameImg, 0, 0, 600, 1440);
+
+    // 3. Draw subtle date at the very bottom
+    ctx.fillStyle = '#86198f';
+    ctx.font = 'bold 22px "Inter", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.globalAlpha = 0.6;
+    ctx.fillText(
+      new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }), 
+      300, 
+      1440 - 36
+    );
+    ctx.globalAlpha = 1.0;
+
+  } else {
+    const paddingSide = 48;
+    const paddingTop = 48;
+    const gap = 24;
+    const paddingBottom = 160;
+
+    canvas.width = pxWidth + (paddingSide * 2);
+    canvas.height = paddingTop + (pxHeight * 4) + (gap * 3) + paddingBottom;
+
+    // Fill background with color or gradient
+    if (bgColor.includes('gradient') || bgColor.includes('linear-gradient') || bgColor.includes('#decbe4') || bgColor.includes('#ffd8a8') || bgColor.includes('#d7fdec')) {
+      const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      if (bgColor.includes('#decbe4') || bgColor.includes('bubblegum')) {
+        grad.addColorStop(0, '#ffc9c9');
+        grad.addColorStop(1, '#decbe4');
+      } else if (bgColor.includes('#ffd8a8') || bgColor.includes('sunset') || bgColor.includes('Sunset')) {
+        grad.addColorStop(0, '#ffe3e3');
+        grad.addColorStop(1, '#ffd8a8');
+      } else if (bgColor.includes('#d7fdec') || bgColor.includes('blobby') || bgColor.includes('Blobby')) {
+        grad.addColorStop(0, '#d7fdec');
+        grad.addColorStop(1, '#ffebf0');
+      } else {
+        grad.addColorStop(0, '#fbcfe8');
+        grad.addColorStop(1, '#cfe2ff');
+      }
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
     } else {
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Draw 4 photos iteratively
+    for (let i = 0; i < photos.length; i++) {
+      const img = new Image();
+      img.src = photos[i];
+      
+      await new Promise((resolve) => {
+        img.onload = resolve;
+        img.onerror = resolve;
+      });
+      
+      const y = paddingTop + (i * pxHeight) + (i * gap);
+      ctx.drawImage(img, paddingSide, y, pxWidth, pxHeight);
+
       // Inner shadow/border for dimension
       ctx.strokeStyle = 'rgba(0,0,0,0.06)';
       ctx.lineWidth = 2;
       ctx.strokeRect(paddingSide, y, pxWidth, pxHeight);
     }
+
+    // Ensure custom fonts are loaded in the browser before rendering to canvas
+    try {
+      await document.fonts.ready;
+    } catch (e) {
+      console.warn("Could not wait for fonts to load:", e);
+    }
+
+    // Draw Decorative Flowers & Leaves (only in classic style)
+    if (frameStyle === 'classic') {
+      // 1. Top-Left: Pink Flower & Leaf
+      drawFlower(ctx, 36, 36, 50, "#ffb6c1", "#ffd700");
+      drawLeaf(ctx, 72, 28, 36, "#a8e6cf", 45);
+
+      // 2. Top-Right: Cream Flower
+      drawFlower(ctx, canvas.width - 36, 36, 44, "#fffdd0", "#ffb6c1");
+
+      // 3. Left Edge (between photo 2 and 3)
+      drawFlower(ctx, 24, 984, 40, "#b3cde3", "#ffffff");
+
+      // 4. Right Edge (between photo 3 and 4)
+      drawFlower(ctx, canvas.width - 24, 1458, 44, "#decbe4", "#ffd700");
+      drawLeaf(ctx, canvas.width - 56, 1450, 32, "#a8e6cf", -45);
+
+      // 5. Bottom left flower next to text
+      drawFlower(ctx, 75, canvas.height - 90, 48, "#ffb6c1", "#ffd700");
+
+      // 6. Bottom right flower and leaf next to text
+      drawFlower(ctx, canvas.width - 75, canvas.height - 85, 42, "#fffdd0", "#ffb6c1");
+      drawLeaf(ctx, canvas.width - 115, canvas.height - 85, 34, "#a8e6cf", 90);
+    }
+
+    // Draw Blobby Mascot if selected (only in classic/minimal mode if they pick the Blobby color swatch)
+    if (bgColor.includes('d7fdec') || bgColor.includes('blobby') || bgColor.includes('Blobby')) {
+      const blobbyImg = new Image();
+      blobbyImg.src = blobbyFrameImg;
+      await new Promise((resolve) => {
+        blobbyImg.onload = resolve;
+        blobbyImg.onerror = resolve;
+      });
+      // Draw peeking Blobby mascot at the bottom-right corner
+      const mascotSize = 170;
+      ctx.drawImage(blobbyImg, canvas.width - mascotSize + 25, canvas.height - mascotSize + 15, mascotSize, mascotSize);
+    }
+
+    // Draw Text / Branding
+    ctx.fillStyle = textColor;
+    ctx.font = 'italic bold 52px "Playfair Display", Georgia, serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Dapinoy', canvas.width / 2, canvas.height - 85);
+
+    ctx.font = '20px "Inter", ui-sans-serif, system-ui, sans-serif';
+    ctx.fillText(
+      new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }), 
+      canvas.width / 2, 
+      canvas.height - 45
+    );
   }
-
-  // Ensure custom fonts are loaded in the browser before rendering to canvas
-  try {
-    await document.fonts.ready;
-  } catch (e) {
-    console.warn("Could not wait for fonts to load:", e);
-  }
-
-  // Draw Decorative Flowers & Leaves (only in classic style)
-  if (frameStyle === 'classic') {
-    // 1. Top-Left: Pink Flower & Leaf
-    drawFlower(ctx, 36, 36, 50, "#ffb6c1", "#ffd700");
-    drawLeaf(ctx, 72, 28, 36, "#a8e6cf", 45);
-
-    // 2. Top-Right: Cream Flower
-    drawFlower(ctx, canvas.width - 36, 36, 44, "#fffdd0", "#ffb6c1");
-
-    // 3. Left Edge (between photo 2 and 3)
-    drawFlower(ctx, 24, 984, 40, "#b3cde3", "#ffffff");
-
-    // 4. Right Edge (between photo 3 and 4)
-    drawFlower(ctx, canvas.width - 24, 1458, 44, "#decbe4", "#ffd700");
-    drawLeaf(ctx, canvas.width - 56, 1450, 32, "#a8e6cf", -45);
-
-    // 5. Bottom left flower next to text
-    drawFlower(ctx, 75, canvas.height - 90, 48, "#ffb6c1", "#ffd700");
-
-    // 6. Bottom right flower and leaf next to text
-    drawFlower(ctx, canvas.width - 75, canvas.height - 85, 42, "#fffdd0", "#ffb6c1");
-    drawLeaf(ctx, canvas.width - 115, canvas.height - 85, 34, "#a8e6cf", 90);
-  }
-
-  // Draw Blobby Mascot if selected (only in classic/minimal mode if they pick the Blobby color swatch, not if using full blobby frame style)
-  if (frameStyle !== 'blobby' && (bgColor.includes('d7fdec') || bgColor.includes('blobby') || bgColor.includes('Blobby'))) {
-    const blobbyImg = new Image();
-    blobbyImg.src = blobbyFrameImg;
-    await new Promise((resolve) => {
-      blobbyImg.onload = resolve;
-      blobbyImg.onerror = resolve;
-    });
-    // Draw peeking Blobby mascot at the bottom-right corner
-    const mascotSize = 170;
-    ctx.drawImage(blobbyImg, canvas.width - mascotSize + 25, canvas.height - mascotSize + 15, mascotSize, mascotSize);
-  }
-
-  // Draw Text / Branding
-  ctx.fillStyle = frameStyle === 'blobby' ? '#86198f' : textColor;
-  ctx.font = 'italic bold 52px "Playfair Display", Georgia, serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('Dapinoy', canvas.width / 2, canvas.height - 85);
-
-  ctx.font = '20px "Inter", ui-sans-serif, system-ui, sans-serif';
-  ctx.fillText(
-    new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }), 
-    canvas.width / 2, 
-    canvas.height - 45
-  );
 
   // Trigger Download Event
   const link = document.createElement('a');
