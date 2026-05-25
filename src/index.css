@@ -8,31 +8,91 @@
 }
 
 body {
-  background-color: #f1f5f9;
+  background-color: #080c14;
   margin: 0;
 }
 
-/* Y2K Mesh Gradient Background */
+/* Y2K Futuristic Cyber-Kawaii Background */
 .y2k-mesh-bg {
-  background: 
-    radial-gradient(circle at 15% 20%, rgba(186, 230, 253, 0.45) 0%, transparent 50%), /* pastel blue */
-    radial-gradient(circle at 85% 15%, rgba(243, 232, 255, 0.55) 0%, transparent 50%), /* pastel purple */
-    radial-gradient(circle at 50% 85%, rgba(209, 250, 229, 0.5) 0%, transparent 60%),  /* pastel mint green */
-    #f8fafc;
+  background: #03060f;
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  overflow: hidden;
+}
+
+/* Beautiful ambient glowing rotating layers in the background */
+.y2k-mesh-bg::before {
+  content: "";
+  position: absolute;
+  inset: -60%;
+  background: 
+    radial-gradient(circle at 15% 25%, rgba(6, 182, 212, 0.25) 0%, transparent 45%), /* Cyber Cyan */
+    radial-gradient(circle at 85% 15%, rgba(139, 92, 246, 0.28) 0%, transparent 45%), /* Electric Purple */
+    radial-gradient(circle at 45% 85%, rgba(16, 185, 129, 0.22) 0%, transparent 50%);  /* Mint Candy Green */
+  opacity: 0.9;
+  filter: blur(50px);
+  animation: nebula-drift 35s ease-in-out infinite alternate;
+}
+
+.y2k-mesh-bg::after {
+  content: "";
+  position: absolute;
+  inset: -60%;
+  background: 
+    radial-gradient(circle at 75% 65%, rgba(236, 72, 153, 0.16) 0%, transparent 40%), /* Neon Pink */
+    radial-gradient(circle at 25% 75%, rgba(99, 102, 241, 0.22) 0%, transparent 45%); /* Indigo */
+  opacity: 0.8;
+  filter: blur(60px);
+  animation: nebula-drift-reverse 45s ease-in-out infinite alternate;
+}
+
+@keyframes nebula-drift {
+  0% { transform: rotate(0deg) scale(1); }
+  100% { transform: rotate(360deg) scale(1.12); }
+}
+
+@keyframes nebula-drift-reverse {
+  0% { transform: rotate(360deg) scale(1.12); }
+  100% { transform: rotate(0deg) scale(1); }
 }
 
 /* Cute Grid Pattern overlay for Retro-Y2K vibes */
 .y2k-grid {
   background-image: 
-    linear-gradient(rgba(139, 92, 246, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(139, 92, 246, 0.04) 1px, transparent 1px);
-  background-size: 30px 30px;
+    linear-gradient(rgba(6, 182, 212, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 182, 212, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 1;
+}
+
+/* Perspective Cyber Floor Grid with Infinite Forward Scroll */
+.cyber-floor {
+  position: absolute;
+  bottom: 0;
+  inset-x: 0;
+  height: 38%;
+  background-image: 
+    linear-gradient(rgba(139, 92, 246, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+  transform: perspective(250px) rotateX(60deg);
+  transform-origin: bottom;
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 1;
+  animation: scroll-grid 5s linear infinite;
+}
+
+@keyframes scroll-grid {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 50px;
+  }
 }
