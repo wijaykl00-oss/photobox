@@ -75,9 +75,9 @@ export const downloadStrip = async (
   const pxHeight = 450;
 
   const numPhotos = frameStyle === 'blobby' ? 2 : 4;
-  const paddingSide = frameStyle === 'blobby' ? 84 : 48;   // Wider side borders for blobby
-  const paddingTop = frameStyle === 'blobby' ? 84 : 48;    // Wider top border
-  const gap = frameStyle === 'blobby' ? 48 : 24;           // Gap between photos
+  const paddingSide = frameStyle === 'blobby' ? 120 : 48;   // Wider side borders for blobby
+  const paddingTop = frameStyle === 'blobby' ? 100 : 48;    // Wider top border
+  const gap = frameStyle === 'blobby' ? 64 : 24;           // Gap between photos
   const paddingBottom = frameStyle === 'blobby' ? 180 : 160; // Wider bottom border for text
 
   canvas.width = pxWidth + (paddingSide * 2);
@@ -135,8 +135,8 @@ export const downloadStrip = async (
         frameImg.onload = resolve;
         frameImg.onerror = resolve;
       });
-      // Draw the Blobby Frame slightly larger (matching scale-[1.18] on-screen)
-      const scaleFactor = 1.18;
+      // Draw the Blobby Frame slightly larger (matching scale-[1.46] on-screen)
+      const scaleFactor = 1.46;
       const fw = pxWidth * scaleFactor;
       const fh = pxHeight * scaleFactor;
       const fx = paddingSide - ((fw - pxWidth) / 2);
