@@ -7,6 +7,8 @@ import { Camera, Download, RefreshCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCamera } from './hooks/useCamera';
 import { downloadStrip } from './utils/canvas';
+import hantuKameraImg from '@/item/Hantukamera.png';
+import blobbyFrameImg from '@/item/The Blobby Frame.png';
 
 const STRIP_COLORS = [
   { name: 'Dark', hex: '#18181b', text: '#ffffff' },
@@ -14,7 +16,113 @@ const STRIP_COLORS = [
   { name: 'Rose', hex: '#ffe4e6', text: '#881337' },
   { name: 'Ice', hex: '#e0f2fe', text: '#0c4a6e' },
   { name: 'Lavender', hex: '#f3e8ff', text: '#581c87' },
+  { name: 'Mint Candy', hex: '#d3f9d8', text: '#2b8a3e' },
+  { name: 'Lemon Chiffon', hex: '#fff3bf', text: '#d9480f' },
+  { name: 'Peach Punch', hex: '#ffe3e3', text: '#c92a2a' },
+  { name: 'Bubblegum', hex: 'linear-gradient(to bottom, #ffc9c9, #decbe4)', text: '#862e9c' },
+  { name: 'Sunset Kiss', hex: 'linear-gradient(to bottom, #ffe3e3, #ffd8a8)', text: '#d9480f' },
+  { name: 'Blobby Jelly', hex: 'linear-gradient(to bottom, #d7fdec, #ffebf0)', text: '#86198f', isBlobby: true }
 ];
+
+const BACKGROUND_STICKERS = [
+  { emoji: "🍒", className: "top-[15%] left-[8%] rotate-[-12deg] text-5xl sm:text-6xl" },
+  { emoji: "☁️", className: "top-[40%] left-[3%] rotate-[10deg] text-6xl sm:text-7xl" },
+  { emoji: "✨", className: "top-[26%] left-[16%] rotate-[15deg] text-4xl sm:text-5xl" },
+  { emoji: "💖", className: "top-[82%] left-[18%] rotate-[-8deg] text-5xl sm:text-6xl" },
+  { emoji: "👾", className: "top-[12%] right-[32%] rotate-[12deg] text-5xl sm:text-6xl" },
+  { emoji: "✌️", className: "top-[32%] right-[36%] rotate-[-15deg] text-5xl sm:text-6xl" },
+  { emoji: "🎨", className: "top-[62%] right-[34%] rotate-[8deg] text-4xl sm:text-5xl" },
+];
+
+const Sticker = ({ 
+  emoji, 
+  src, 
+  className = "", 
+  style = {} 
+}: { 
+  emoji?: string; 
+  src?: string; 
+  className?: string; 
+  style?: React.CSSProperties; 
+}) => {
+  return (
+    <motion.div
+      whileHover={{ 
+        scale: 1.15, 
+        rotate: [0, -8, 8, -6, 6, 0],
+        transition: { duration: 0.4, ease: "easeInOut" }
+      }}
+      className={`absolute cursor-pointer select-none filter drop-shadow-[0_4px_6px_rgba(0,0,0,0.06)] hover:drop-shadow-[0_10px_15px_rgba(0,0,0,0.12)] transition-shadow duration-300 pointer-events-auto z-10 ${className}`}
+      style={style}
+    >
+      {src ? (
+        <img src={src} alt="sticker" className="w-full h-full object-contain" />
+      ) : (
+        <span className="inline-block select-none">{emoji}</span>
+      )}
+    </motion.div>
+  );
+};
+
+const HantuKameraDecor = () => {
+  const [blink, setBlink] = useState(false);
+  const [flash, setFlash] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      setBlink(true);
+      await sleep(150);
+      setBlink(false);
+      
+      setFlash(true);
+      await sleep(250);
+      setFlash(false);
+    }, 4500);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <motion.div
+      animate={{ 
+        y: [0, -8, 0],
+      }}
+      transition={{ 
+        repeat: Infinity, 
+        duration: 3.5, 
+        ease: "easeInOut" 
+      }}
+      whileHover={{ 
+        scale: 1.1,
+        rotate: [0, -4, 4, 0]
+      }}
+      className="absolute bottom-6 left-6 w-24 h-24 sm:w-28 sm:h-28 cursor-pointer z-20 select-none pointer-events-auto hidden md:block"
+    >
+      <img 
+        src={hantuKameraImg} 
+        alt="Hantu Kamera" 
+        className={`w-full h-full object-contain filter drop-shadow-lg transition-transform duration-150 ${
+          blink ? 'scale-y-90' : 'scale-y-100'
+        }`}
+      />
+      <AnimatePresence>
+        {flash && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.2 }}
+            animate={{ opacity: 1, scale: [1, 1.4, 1] }}
+            exit={{ opacity: 0, scale: 0.2 }}
+            className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none"
+          >
+            <svg width="60" height="60" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M50 0L64 36L100 50L64 64L50 100L36 64L0 50L36 36Z" fill="#ffeb3b" />
+              <circle cx="50" cy="50" r="12" fill="#ffffff" />
+            </svg>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+};
 
 // Cute Flower Component
 const CuteFlower = ({ 
@@ -132,8 +240,19 @@ export default function App() {
       className={`shadow-2xl flex flex-col mx-auto relative overflow-hidden transition-all ${
         isReviewing ? 'w-[300px] sm:w-[340px]' : 'w-[240px] sm:w-[260px]'
       }`}
-      style={{ backgroundColor: stripColor.hex }}
+      style={{ background: stripColor.hex }}
     >
+      {/* Blobby Mascot hugging the frame if isBlobby theme is chosen */}
+      {stripColor.isBlobby && (
+        <motion.img 
+          src={blobbyFrameImg} 
+          alt="Blobby Mascot" 
+          animate={{ scale: [1, 1.03, 1], y: [0, -3, 0] }}
+          transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+          className="absolute -bottom-5 -right-6 w-24 sm:w-28 z-20 pointer-events-none filter drop-shadow-md select-none"
+        />
+      )}
+
       {/* Decorative Flowers and Leaves */}
       {/* Top-Left Flower & Leaf */}
       <div className="absolute top-2.5 left-2.5 flex items-center select-none pointer-events-none z-10">
@@ -198,17 +317,32 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white font-sans flex text-sm sm:text-base relative overflow-hidden">
+    <div className="min-h-screen text-neutral-800 font-sans flex text-sm sm:text-base relative overflow-hidden bg-slate-50">
+      {/* Y2K Pastel Grid Background */}
+      <div className="y2k-mesh-bg" />
+      <div className="y2k-grid" />
+
+      {/* Background Stickers Overlay */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden select-none z-0">
+        {BACKGROUND_STICKERS.map((s, idx) => (
+          <Sticker key={idx} emoji={s.emoji} className={s.className} />
+        ))}
+        {/* Animated Blinking HantuKamera */}
+        <HantuKameraDecor />
+        {/* Floating Blobby Mascot sticker */}
+        <Sticker src={blobbyFrameImg} className="bottom-[14%] right-[33%] w-24 h-24 hidden xl:block rotate-[6deg]" />
+      </div>
+
       {/* 
         ========================================
         LEFT COLUMN / MAIN VIEW (Camera & Controls)
         ========================================
       */}
-      <div className="flex-1 flex flex-col relative h-screen">
+      <div className="flex-1 flex flex-col relative h-screen z-10">
         {/* Top Header */}
-        <header className="absolute top-0 inset-x-0 p-6 z-20 flex justify-between items-center bg-gradient-to-b from-black/80 to-transparent">
-          <div className="font-display font-bold text-xl sm:text-2xl flex items-center gap-2 drop-shadow-md">
-            <Camera className="w-6 h-6 sm:w-7 sm:h-7" /> PHOTOBOX
+        <header className="absolute top-0 inset-x-0 p-6 z-20 flex justify-between items-center bg-gradient-to-b from-white/30 to-transparent">
+          <div className="font-display font-bold text-xl sm:text-2xl flex items-center gap-2 drop-shadow-sm text-neutral-800">
+            <Camera className="w-6 h-6 sm:w-7 sm:h-7 text-violet-500" /> PHOTOBOX
           </div>
 
           {/* Progress Indicator for Desktop & Mobile */}
@@ -217,12 +351,12 @@ export default function App() {
               {[0, 1, 2, 3].map(i => (
                 <div 
                   key={i} 
-                  className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-colors drop-shadow-md ${
+                  className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-colors drop-shadow-sm ${
                     photos.length > i 
-                      ? 'bg-white' 
+                      ? 'bg-violet-500' 
                       : photos.length === i && mode === 'capturing' 
                       ? 'bg-red-500 animate-pulse' 
-                      : 'bg-white/30'
+                      : 'bg-neutral-300/60'
                   }`} 
                 />
               ))}
@@ -231,17 +365,17 @@ export default function App() {
         </header>
 
         {/* Camera Feed */}
-        <main className="flex-1 relative border-b md:border-b-0 md:border-r border-neutral-800 bg-neutral-900 overflow-hidden">
+        <main className="flex-1 relative border-b md:border-b-0 md:border-r border-slate-200/50 bg-transparent overflow-hidden">
           {error ? (
-            <div className="absolute inset-0 flex items-center justify-center p-6 text-center text-red-500 bg-black/40">
+            <div className="absolute inset-0 flex items-center justify-center p-6 text-center text-red-500 bg-white/40 backdrop-blur-sm">
               <div className="bg-red-500/10 p-6 rounded-2xl border border-red-500/20 max-w-md">
                 {error}
               </div>
             </div>
           ) : (
             <div className="absolute inset-0 flex items-center justify-center pb-24 md:pb-0">
-              {/* Aspect Ratio Constraint 4:3 */}
-              <div className="relative w-full max-w-3xl aspect-[4/3] bg-black sm:rounded-2xl md:rounded-[2rem] overflow-hidden shadow-2xl sm:ring-1 ring-white/10 md:m-12 lg:m-24">
+              {/* Aspect Ratio Constraint 4:3 with cute sticker border */}
+              <div className="relative w-full max-w-3xl aspect-[4/3] bg-black sm:rounded-[2rem] overflow-hidden shadow-2xl shadow-violet-100/50 border-[6px] border-white md:m-12 lg:m-24 z-10 transition-all">
                 <video 
                   ref={videoRef} 
                   autoPlay 
@@ -251,7 +385,7 @@ export default function App() {
                 />
                 
                 {stream === null && mode !== 'review' && (
-                  <div className="absolute inset-0 flex items-center justify-center text-neutral-400 font-medium">
+                  <div className="absolute inset-0 flex items-center justify-center text-neutral-400 font-medium bg-neutral-950/90">
                     <span className="animate-pulse">Mengakses Kamera...</span>
                   </div>
                 )}
@@ -290,32 +424,32 @@ export default function App() {
           )}
 
           {/* Bottom Action Bar */}
-          <div className="absolute bottom-0 inset-x-0 p-6 md:p-10 flex flex-col items-center justify-center gap-6 bg-gradient-to-t from-black via-black/80 to-transparent">
+          <div className="absolute bottom-0 inset-x-0 p-6 md:p-10 flex flex-col items-center justify-center gap-6 bg-gradient-to-t from-white via-white/80 to-transparent z-20">
             {/* Color controls shown prominently on Mobile (bottom) when idle */}
-            <div className="flex gap-4 md:hidden">
+            <div className="flex gap-3 overflow-x-auto max-w-full px-4 pb-2 md:hidden pointer-events-auto">
               {mode === 'idle' && STRIP_COLORS.map(c => (
                 <button
                   key={c.name}
                   onClick={() => setStripColor(c)}
-                  style={{ backgroundColor: c.hex }}
-                  className={`w-10 h-10 rounded-full shadow-lg ring-2 ring-offset-4 ring-offset-neutral-950 transition-transform ${
-                    stripColor.name === c.name ? 'ring-blue-500 scale-110' : 'ring-transparent opacity-80 hover:scale-105'
+                  style={{ background: c.hex }}
+                  className={`w-9 h-9 rounded-full shrink-0 shadow-md ring-2 ring-offset-2 ring-offset-white transition-transform ${
+                    stripColor.name === c.name ? 'ring-violet-500 scale-110' : 'ring-transparent opacity-80 hover:scale-105'
                   }`}
                 />
               ))}
             </div>
 
-            <div className="mx-auto transform-gpu pb-2 md:pb-0">
+            <div className="mx-auto transform-gpu pb-2 md:pb-0 pointer-events-auto">
               {mode === 'idle' && stream && (
                 <button
                   onClick={startSession}
-                  className="h-16 sm:h-20 px-10 sm:px-14 rounded-full bg-white text-black font-display font-bold text-xl sm:text-2xl flex items-center gap-3 hover:bg-neutral-200 hover:scale-105 transition-all shadow-[0_0_50px_rgba(255,255,255,0.4)] active:scale-95"
+                  className="h-16 sm:h-20 px-10 sm:px-14 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 text-white font-display font-bold text-xl sm:text-2xl flex items-center gap-3 hover:from-violet-600 hover:to-indigo-600 hover:scale-105 hover:shadow-lg hover:shadow-violet-200 transition-all active:scale-95 cursor-pointer shadow-md"
                 >
                   <Camera className="w-6 h-6 sm:w-8 sm:h-8" /> Mulai Foto
                 </button>
               )}
               {mode === 'capturing' && (
-                <div className="h-16 sm:h-20 px-8 sm:px-12 rounded-full bg-red-500/20 text-red-500 font-display font-bold text-xl sm:text-2xl flex items-center justify-center border border-red-500/50 backdrop-blur-md">
+                <div className="h-16 sm:h-20 px-8 sm:px-12 rounded-full bg-red-500/10 text-red-500 font-display font-bold text-xl sm:text-2xl flex items-center justify-center border border-red-500/30 backdrop-blur-md shadow-sm">
                   <span className="animate-pulse flex items-center gap-3">
                     <span className="w-3 h-3 rounded-full bg-red-500" /> Sesi Aktif...
                   </span>
@@ -331,24 +465,22 @@ export default function App() {
         RIGHT COLUMN (DESKTOP) - STRIP PREVIEW
         ========================================
       */}
-      <div className="hidden md:flex w-[380px] lg:w-[480px] bg-neutral-950 flex-col relative z-30 shadow-2xl">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-neutral-900/40 via-neutral-950 to-neutral-950 pointer-events-none" />
-        
+      <div className="hidden md:flex w-[380px] lg:w-[480px] bg-white/40 backdrop-blur-xl flex-col relative z-30 shadow-2xl border-l border-white/50 text-neutral-800">
         <div className="relative h-full flex flex-col p-8 z-10 w-full overflow-y-auto">
           <div className="flex justify-between items-end mb-10 pt-2">
             <div>
-              <h2 className="font-display font-bold text-2xl text-white">Pratinjau</h2>
-              <p className="text-neutral-400 mt-1">Pilih warna bingkai Anda</p>
+              <h2 className="font-display font-bold text-2xl text-neutral-800">Pratinjau</h2>
+              <p className="text-neutral-500 mt-1">Pilih warna bingkai Anda</p>
             </div>
             {/* Color Pickers for Desktop */}
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2 max-w-[180px] justify-end pointer-events-auto">
               {STRIP_COLORS.map(c => (
                 <button
                   key={c.name}
                   onClick={() => setStripColor(c)}
-                  style={{ backgroundColor: c.hex }}
-                  className={`w-7 h-7 rounded-full transition-transform ring-2 ring-offset-2 ring-offset-neutral-950 ${
-                    stripColor.name === c.name ? 'ring-blue-500 scale-110' : 'ring-transparent opacity-60 hover:opacity-100 hover:scale-105'
+                  style={{ background: c.hex }}
+                  className={`w-6 h-6 rounded-full transition-transform ring-2 ring-offset-2 ring-offset-white cursor-pointer ${
+                    stripColor.name === c.name ? 'ring-violet-500 scale-110' : 'ring-transparent opacity-80 hover:opacity-100 hover:scale-105'
                   }`}
                   title={c.name}
                 />
@@ -356,7 +488,7 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex-1 flex justify-center py-4">
+          <div className="flex-1 flex justify-center py-4 select-none">
             <Strip isReviewing={false} />
           </div>
         </div>
@@ -373,25 +505,25 @@ export default function App() {
             initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
             animate={{ opacity: 1, backdropFilter: "blur(40px)" }}
             exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            className="fixed inset-0 z-50 bg-neutral-950/80 flex flex-col items-center justify-center py-6 sm:py-12 overflow-y-auto"
+            className="fixed inset-0 z-50 bg-slate-100/60 backdrop-blur-2xl flex flex-col items-center justify-center py-6 sm:py-12 overflow-y-auto"
           >
-             <div className="flex-1 min-h-0 flex items-center justify-center p-4 py-8">
+             <div className="flex-1 min-h-0 flex items-center justify-center p-4 py-8 select-none">
                {/* 
                  Slightly scale up the strip for Review Mode, or keep it standard depending on screen size.
-                 The `isReviewिंग` flag makes it visually prominent.
+                 The `isReviewing` flag makes it visually prominent.
                */}
                <Strip isReviewing={true} />
             </div>
-            <div className="flex shrink-0 w-full max-w-sm gap-4 mt-auto mb-6 px-6 relative z-10 flex-col sm:flex-row">
+            <div className="flex shrink-0 w-full max-w-sm gap-4 mt-auto mb-6 px-6 relative z-10 flex-col sm:flex-row pointer-events-auto">
               <button
                 onClick={() => { setMode('idle'); setPhotos([]); }}
-                className="flex-1 py-4 sm:py-5 rounded-full bg-neutral-800/80 backdrop-blur-md border border-neutral-700 text-white font-medium flex items-center justify-center gap-2 hover:bg-neutral-700 transition active:scale-95"
+                className="flex-1 py-4 sm:py-5 rounded-full bg-white/90 backdrop-blur-md border border-slate-200 text-neutral-800 font-medium flex items-center justify-center gap-2 hover:bg-white transition active:scale-95 cursor-pointer shadow-sm"
               >
-                <RefreshCcw className="w-5 h-5" /> Retake
+                <RefreshCcw className="w-5 h-5 text-neutral-600" /> Retake
               </button>
               <button
                 onClick={handleDownload}
-                className="flex-1 py-4 sm:py-5 rounded-full bg-white text-black font-display font-bold text-lg flex items-center justify-center gap-2 hover:bg-neutral-200 transition shadow-[0_0_40px_rgba(255,255,255,0.2)] active:scale-95"
+                className="flex-1 py-4 sm:py-5 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 text-white font-display font-bold text-lg flex items-center justify-center gap-2 hover:from-violet-600 hover:to-indigo-600 transition shadow-lg shadow-violet-200 active:scale-95 cursor-pointer"
               >
                 <Download className="w-5 h-5" /> Simpan
               </button>
