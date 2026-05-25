@@ -240,14 +240,11 @@ export default function App() {
       initial={isReviewing ? { opacity: 0, y: 50 } : false}
       animate={{ opacity: 1, y: 0 }}
       className={`shadow-2xl flex flex-col mx-auto relative overflow-hidden transition-all ${
-        isReviewing ? 'w-[300px] sm:w-[340px]' : 'w-[240px] sm:w-[260px]'
+        frameStyle === 'blobby'
+          ? (isReviewing ? 'w-[320px] sm:w-[360px]' : 'w-[250px] sm:w-[270px]')
+          : (isReviewing ? 'w-[300px] sm:w-[340px]' : 'w-[240px] sm:w-[260px]')
       }`}
-      style={frameStyle === 'blobby' ? {
-        backgroundImage: `url(${blobbyFrameImg})`,
-        backgroundSize: '100% 100%',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      } : { background: stripColor.hex }}
+      style={{ background: stripColor.hex }}
     >
       {/* Blobby Mascot hugging the frame if isBlobby theme is chosen (only if not using full blobby frame style) */}
       {frameStyle !== 'blobby' && stripColor.isBlobby && (
@@ -287,18 +284,38 @@ export default function App() {
         </>
       )}
 
-      <div className={`flex flex-col relative ${isReviewing ? 'p-6 gap-4 pb-24 pt-8' : 'p-5 gap-3 pb-20 pt-6'}`}>
+      <div className={`flex flex-col relative transition-all ${
+        frameStyle === 'blobby'
+          ? (isReviewing ? 'p-7 sm:p-8 gap-5 pb-28 pt-10' : 'p-6 gap-4 pb-24 pt-8')
+          : (isReviewing ? 'p-6 gap-4 pb-24 pt-8' : 'p-5 gap-3 pb-20 pt-6')
+      }`}>
         {[0, 1, 2, 3].map(i => (
           <div 
             key={i} 
-            className="bg-black/10 w-full aspect-[4/3] rounded overflow-hidden relative border border-black/5 z-0"
+            className={`w-full aspect-[4/3] relative ${
+              frameStyle === 'blobby' ? 'p-2 sm:p-2.5 z-0' : 'bg-black/10 rounded overflow-hidden border border-black/5 z-0'
+            }`}
           >
-            {photos[i] ? (
-              <img src={photos[i]} alt={`Shot ${i+1}`} className="w-full h-full object-cover" />
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center text-black/20 font-medium">
-                {i + 1}
-              </div>
+            {/* The photo, rounded at the corners underneath the Blobby Frame */}
+            <div className="w-full h-full overflow-hidden rounded-[8px]">
+              {photos[i] ? (
+                <img src={photos[i]} alt={`Shot ${i+1}`} className="w-full h-full object-cover" />
+              ) : (
+                <div className={`absolute inset-0 flex items-center justify-center font-medium ${
+                  frameStyle === 'blobby' ? 'text-neutral-400 bg-neutral-200/50' : 'text-black/20'
+                }`}>
+                  {i + 1}
+                </div>
+              )}
+            </div>
+
+            {/* Blobby Frame overlaying the photo box */}
+            {frameStyle === 'blobby' && (
+              <img 
+                src={blobbyFrameImg} 
+                alt="Blobby Frame" 
+                className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-10 scale-[1.04] filter drop-shadow-sm" 
+              />
             )}
           </div>
         ))}

@@ -73,46 +73,35 @@ export const downloadStrip = async (
   // 4:3 Aspect Ratio for photos
   const pxWidth = 600;
   const pxHeight = 450;
-  const paddingSide = 48;   // Wider side borders
-  const paddingTop = 48;    // Wider top border
-  const gap = 24;           // Gap between photos
-  const paddingBottom = 160; // Wider bottom border for text and flowers
+  const paddingSide = frameStyle === 'blobby' ? 64 : 48;   // Wider side borders for blobby
+  const paddingTop = frameStyle === 'blobby' ? 64 : 48;    // Wider top border
+  const gap = frameStyle === 'blobby' ? 36 : 24;           // Gap between photos
+  const paddingBottom = frameStyle === 'blobby' ? 180 : 160; // Wider bottom border for text
 
   canvas.width = pxWidth + (paddingSide * 2);
   canvas.height = paddingTop + (pxHeight * 4) + (gap * 3) + paddingBottom;
 
-  // Fill background
-  if (frameStyle === 'blobby') {
-    const blobbyImg = new Image();
-    blobbyImg.src = blobbyFrameImg;
-    await new Promise((resolve) => {
-      blobbyImg.onload = resolve;
-      blobbyImg.onerror = resolve; // Continue even if one fails
-    });
-    ctx.drawImage(blobbyImg, 0, 0, canvas.width, canvas.height);
-  } else {
-    // Fill background with color or gradient
-    if (bgColor.includes('gradient') || bgColor.includes('linear-gradient') || bgColor.includes('#decbe4') || bgColor.includes('#ffd8a8') || bgColor.includes('#d7fdec')) {
-      const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      if (bgColor.includes('#decbe4') || bgColor.includes('bubblegum')) {
-        grad.addColorStop(0, '#ffc9c9');
-        grad.addColorStop(1, '#decbe4');
-      } else if (bgColor.includes('#ffd8a8') || bgColor.includes('sunset') || bgColor.includes('Sunset')) {
-        grad.addColorStop(0, '#ffe3e3');
-        grad.addColorStop(1, '#ffd8a8');
-      } else if (bgColor.includes('#d7fdec') || bgColor.includes('blobby') || bgColor.includes('Blobby')) {
-        grad.addColorStop(0, '#d7fdec');
-        grad.addColorStop(1, '#ffebf0');
-      } else {
-        grad.addColorStop(0, '#fbcfe8');
-        grad.addColorStop(1, '#cfe2ff');
-      }
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // Fill background with color or gradient (all styles now support color/gradient backgrounds!)
+  if (bgColor.includes('gradient') || bgColor.includes('linear-gradient') || bgColor.includes('#decbe4') || bgColor.includes('#ffd8a8') || bgColor.includes('#d7fdec')) {
+    const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    if (bgColor.includes('#decbe4') || bgColor.includes('bubblegum')) {
+      grad.addColorStop(0, '#ffc9c9');
+      grad.addColorStop(1, '#decbe4');
+    } else if (bgColor.includes('#ffd8a8') || bgColor.includes('sunset') || bgColor.includes('Sunset')) {
+      grad.addColorStop(0, '#ffe3e3');
+      grad.addColorStop(1, '#ffd8a8');
+    } else if (bgColor.includes('#d7fdec') || bgColor.includes('blobby') || bgColor.includes('Blobby')) {
+      grad.addColorStop(0, '#d7fdec');
+      grad.addColorStop(1, '#ffebf0');
     } else {
-      ctx.fillStyle = bgColor;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      grad.addColorStop(0, '#fbcfe8');
+      grad.addColorStop(1, '#cfe2ff');
     }
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  } else {
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
   // Draw photos iteratively
@@ -128,10 +117,21 @@ export const downloadStrip = async (
     const y = paddingTop + (i * pxHeight) + (i * gap);
     ctx.drawImage(img, paddingSide, y, pxWidth, pxHeight);
 
-    // Inner shadow/border for dimension
-    ctx.strokeStyle = 'rgba(0,0,0,0.06)';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(paddingSide, y, pxWidth, pxHeight);
+    // If frameStyle is blobby, draw the Blobby Frame image overlaying each photo slot
+    if (frameStyle === 'blobby') {
+      const frameImg = new Image();
+      frameImg.src = blobbyFrameImg;
+      await new Promise((resolve) => {
+        frameImg.onload = resolve;
+        frameImg.onerror = resolve;
+      });
+      ctx.drawImage(frameImg, paddingSide, y, pxWidth, pxHeight);
+    } else {
+      // Inner shadow/border for dimension
+      ctx.strokeStyle = 'rgba(0,0,0,0.06)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(paddingSide, y, pxWidth, pxHeight);
+    }
   }
 
   // Ensure custom fonts are loaded in the browser before rendering to canvas
@@ -165,7 +165,7 @@ export const downloadStrip = async (
     drawLeaf(ctx, canvas.width - 115, canvas.height - 85, 34, "#a8e6cf", 90);
   }
 
-  // Draw Blobby Mascot if selected (only in classic/minimal mode if they pick the Blobby color swatch, not if the entire frame is Blobby Frame!)
+  // Draw Blobby Mascot if selected (only in classic/minimal mode if they pick the Blobby color swatch, not if using full blobby frame style)
   if (frameStyle !== 'blobby' && (bgColor.includes('d7fdec') || bgColor.includes('blobby') || bgColor.includes('Blobby'))) {
     const blobbyImg = new Image();
     blobbyImg.src = blobbyFrameImg;
