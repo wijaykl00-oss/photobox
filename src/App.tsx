@@ -16,6 +16,60 @@ const STRIP_COLORS = [
   { name: 'Lavender', hex: '#f3e8ff', text: '#581c87' },
 ];
 
+// Cute Flower Component
+const CuteFlower = ({ 
+  size = 24, 
+  color = "#ffb6c1", 
+  centerColor = "#ffd700", 
+  className = "" 
+}: { 
+  size?: number; 
+  color?: string; 
+  centerColor?: string; 
+  className?: string; 
+}) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 100 100" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+    className={`select-none pointer-events-none ${className}`}
+  >
+    <circle cx="50" cy="25" r="18" fill={color} />
+    <circle cx="26" cy="42" r="18" fill={color} />
+    <circle cx="35" cy="71" r="18" fill={color} />
+    <circle cx="65" cy="71" r="18" fill={color} />
+    <circle cx="74" cy="42" r="18" fill={color} />
+    <circle cx="50" cy="50" r="15" fill={centerColor} />
+  </svg>
+);
+
+// Cute Leaf Component
+const CuteLeaf = ({ 
+  size = 24, 
+  color = "#a8e6cf", 
+  className = "" 
+}: { 
+  size?: number; 
+  color?: string; 
+  className?: string; 
+}) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 100 100" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+    className={`select-none pointer-events-none ${className}`}
+  >
+    <path 
+      d="M50 80C50 80 80 55 80 30C80 15 65 15 50 30C35 15 20 15 20 30C20 55 50 80 50 80Z" 
+      fill={color} 
+    />
+  </svg>
+);
+
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
 export default function App() {
@@ -75,16 +129,39 @@ export default function App() {
       layout
       initial={isReviewing ? { opacity: 0, y: 50 } : false}
       animate={{ opacity: 1, y: 0 }}
-      className={`shadow-2xl flex flex-col mx-auto ${
-        isReviewing ? 'w-[280px] sm:w-[320px]' : 'w-[240px]'
+      className={`shadow-2xl flex flex-col mx-auto relative overflow-hidden transition-all ${
+        isReviewing ? 'w-[300px] sm:w-[340px]' : 'w-[240px] sm:w-[260px]'
       }`}
       style={{ backgroundColor: stripColor.hex }}
     >
-      <div className={`flex flex-col p-3 ${isReviewing ? 'gap-3 pb-16 pt-4' : 'gap-2 pb-14 pt-3'}`}>
+      {/* Decorative Flowers and Leaves */}
+      {/* Top-Left Flower & Leaf */}
+      <div className="absolute top-2.5 left-2.5 flex items-center select-none pointer-events-none z-10">
+        <CuteFlower size={isReviewing ? 28 : 22} color="#ffb6c1" centerColor="#ffd700" />
+        <CuteLeaf size={isReviewing ? 18 : 14} color="#a8e6cf" className="rotate-45 -ml-1 -mt-2.5" />
+      </div>
+
+      {/* Top-Right Flower */}
+      <div className="absolute top-3 right-3 select-none pointer-events-none z-10">
+        <CuteFlower size={isReviewing ? 24 : 18} color="#fffdd0" centerColor="#ffb6c1" />
+      </div>
+
+      {/* Left Side Flower (between photo 2 and 3) */}
+      <div className="absolute top-[48%] left-1.5 sm:left-2 -translate-y-1/2 select-none pointer-events-none z-10">
+        <CuteFlower size={isReviewing ? 22 : 16} color="#b3cde3" centerColor="#ffffff" />
+      </div>
+
+      {/* Right Side Flower & Leaf (between photo 3 and 4) */}
+      <div className="absolute top-[71%] right-2 sm:right-2.5 -translate-y-1/2 flex items-center select-none pointer-events-none z-10">
+        <CuteLeaf size={isReviewing ? 16 : 12} color="#a8e6cf" className="-rotate-45 -mr-1" />
+        <CuteFlower size={isReviewing ? 24 : 18} color="#decbe4" centerColor="#ffd700" />
+      </div>
+
+      <div className={`flex flex-col relative ${isReviewing ? 'p-6 gap-4 pb-24 pt-8' : 'p-5 gap-3 pb-20 pt-6'}`}>
         {[0, 1, 2, 3].map(i => (
           <div 
             key={i} 
-            className="bg-black/10 w-full aspect-[4/3] rounded overflow-hidden relative border border-black/5"
+            className="bg-black/10 w-full aspect-[4/3] rounded overflow-hidden relative border border-black/5 z-0"
           >
             {photos[i] ? (
               <img src={photos[i]} alt={`Shot ${i+1}`} className="w-full h-full object-cover" />
@@ -97,11 +174,22 @@ export default function App() {
         ))}
         {/* Strip Branding */}
         <div
-          className="w-full flex flex-col items-center justify-center mt-2 tracking-tight"
+          className="w-full flex flex-col items-center justify-center mt-3 tracking-tight relative z-10"
           style={{ color: stripColor.text }}
         >
-          <span className="font-display font-bold text-xl sm:text-2xl pt-1">PHOTOBOX</span>
-          <span className="font-sans text-[10px] sm:text-xs opacity-70">
+          {/* Left branding flower */}
+          <div className="absolute left-0 bottom-2 select-none pointer-events-none">
+            <CuteFlower size={isReviewing ? 26 : 20} color="#ffb6c1" centerColor="#ffd700" />
+          </div>
+
+          {/* Right branding flower & leaf */}
+          <div className="absolute right-0 bottom-2 select-none pointer-events-none flex items-center">
+            <CuteLeaf size={isReviewing ? 18 : 14} color="#a8e6cf" className="rotate-90 -mr-1.5" />
+            <CuteFlower size={isReviewing ? 22 : 16} color="#fffdd0" centerColor="#ffb6c1" />
+          </div>
+
+          <span className="font-playfair font-bold text-2xl sm:text-3xl pt-1 italic tracking-wide">Dapinoy</span>
+          <span className="font-sans text-[10px] sm:text-xs opacity-60 tracking-wider mt-1 uppercase">
             {new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
           </span>
         </div>
