@@ -1,0 +1,6 @@
+{
+  "name": "Photobox",
+  "description": "Virtual photobox application for capturing photo strips.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
