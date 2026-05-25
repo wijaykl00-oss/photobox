@@ -58,7 +58,12 @@ const drawLeaf = (
   ctx.restore();
 };
 
-export const downloadStrip = async (photos: string[], bgColor: string, textColor: string) => {
+export const downloadStrip = async (
+  photos: string[], 
+  bgColor: string, 
+  textColor: string,
+  frameStyle: 'classic' | 'blobby' | 'minimal' = 'classic'
+) => {
   if (photos.length === 0) return;
   
   const canvas = document.createElement('canvas');
@@ -76,27 +81,38 @@ export const downloadStrip = async (photos: string[], bgColor: string, textColor
   canvas.width = pxWidth + (paddingSide * 2);
   canvas.height = paddingTop + (pxHeight * 4) + (gap * 3) + paddingBottom;
 
-  // Fill background (supports colors and gradients)
-  if (bgColor.includes('gradient') || bgColor.includes('linear-gradient') || bgColor.includes('#decbe4') || bgColor.includes('#ffd8a8') || bgColor.includes('#d7fdec')) {
-    const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    if (bgColor.includes('#decbe4') || bgColor.includes('bubblegum')) {
-      grad.addColorStop(0, '#ffc9c9');
-      grad.addColorStop(1, '#decbe4');
-    } else if (bgColor.includes('#ffd8a8') || bgColor.includes('sunset') || bgColor.includes('Sunset')) {
-      grad.addColorStop(0, '#ffe3e3');
-      grad.addColorStop(1, '#ffd8a8');
-    } else if (bgColor.includes('#d7fdec') || bgColor.includes('blobby') || bgColor.includes('Blobby')) {
-      grad.addColorStop(0, '#d7fdec');
-      grad.addColorStop(1, '#ffebf0');
-    } else {
-      grad.addColorStop(0, '#fbcfe8');
-      grad.addColorStop(1, '#cfe2ff');
-    }
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // Fill background
+  if (frameStyle === 'blobby') {
+    const blobbyImg = new Image();
+    blobbyImg.src = blobbyFrameImg;
+    await new Promise((resolve) => {
+      blobbyImg.onload = resolve;
+      blobbyImg.onerror = resolve; // Continue even if one fails
+    });
+    ctx.drawImage(blobbyImg, 0, 0, canvas.width, canvas.height);
   } else {
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Fill background with color or gradient
+    if (bgColor.includes('gradient') || bgColor.includes('linear-gradient') || bgColor.includes('#decbe4') || bgColor.includes('#ffd8a8') || bgColor.includes('#d7fdec')) {
+      const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      if (bgColor.includes('#decbe4') || bgColor.includes('bubblegum')) {
+        grad.addColorStop(0, '#ffc9c9');
+        grad.addColorStop(1, '#decbe4');
+      } else if (bgColor.includes('#ffd8a8') || bgColor.includes('sunset') || bgColor.includes('Sunset')) {
+        grad.addColorStop(0, '#ffe3e3');
+        grad.addColorStop(1, '#ffd8a8');
+      } else if (bgColor.includes('#d7fdec') || bgColor.includes('blobby') || bgColor.includes('Blobby')) {
+        grad.addColorStop(0, '#d7fdec');
+        grad.addColorStop(1, '#ffebf0');
+      } else {
+        grad.addColorStop(0, '#fbcfe8');
+        grad.addColorStop(1, '#cfe2ff');
+      }
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    } else {
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
   }
 
   // Draw photos iteratively
@@ -125,30 +141,32 @@ export const downloadStrip = async (photos: string[], bgColor: string, textColor
     console.warn("Could not wait for fonts to load:", e);
   }
 
-  // Draw Decorative Flowers & Leaves
-  // 1. Top-Left: Pink Flower & Leaf
-  drawFlower(ctx, 36, 36, 50, "#ffb6c1", "#ffd700");
-  drawLeaf(ctx, 72, 28, 36, "#a8e6cf", 45);
+  // Draw Decorative Flowers & Leaves (only in classic style)
+  if (frameStyle === 'classic') {
+    // 1. Top-Left: Pink Flower & Leaf
+    drawFlower(ctx, 36, 36, 50, "#ffb6c1", "#ffd700");
+    drawLeaf(ctx, 72, 28, 36, "#a8e6cf", 45);
 
-  // 2. Top-Right: Cream Flower
-  drawFlower(ctx, canvas.width - 36, 36, 44, "#fffdd0", "#ffb6c1");
+    // 2. Top-Right: Cream Flower
+    drawFlower(ctx, canvas.width - 36, 36, 44, "#fffdd0", "#ffb6c1");
 
-  // 3. Left Edge (between photo 2 and 3)
-  drawFlower(ctx, 24, 984, 40, "#b3cde3", "#ffffff");
+    // 3. Left Edge (between photo 2 and 3)
+    drawFlower(ctx, 24, 984, 40, "#b3cde3", "#ffffff");
 
-  // 4. Right Edge (between photo 3 and 4)
-  drawFlower(ctx, canvas.width - 24, 1458, 44, "#decbe4", "#ffd700");
-  drawLeaf(ctx, canvas.width - 56, 1450, 32, "#a8e6cf", -45);
+    // 4. Right Edge (between photo 3 and 4)
+    drawFlower(ctx, canvas.width - 24, 1458, 44, "#decbe4", "#ffd700");
+    drawLeaf(ctx, canvas.width - 56, 1450, 32, "#a8e6cf", -45);
 
-  // 5. Bottom left flower next to text
-  drawFlower(ctx, 75, canvas.height - 90, 48, "#ffb6c1", "#ffd700");
+    // 5. Bottom left flower next to text
+    drawFlower(ctx, 75, canvas.height - 90, 48, "#ffb6c1", "#ffd700");
 
-  // 6. Bottom right flower and leaf next to text
-  drawFlower(ctx, canvas.width - 75, canvas.height - 85, 42, "#fffdd0", "#ffb6c1");
-  drawLeaf(ctx, canvas.width - 115, canvas.height - 85, 34, "#a8e6cf", 90);
+    // 6. Bottom right flower and leaf next to text
+    drawFlower(ctx, canvas.width - 75, canvas.height - 85, 42, "#fffdd0", "#ffb6c1");
+    drawLeaf(ctx, canvas.width - 115, canvas.height - 85, 34, "#a8e6cf", 90);
+  }
 
-  // Draw Blobby Mascot if selected
-  if (bgColor.includes('d7fdec') || bgColor.includes('blobby') || bgColor.includes('Blobby')) {
+  // Draw Blobby Mascot if selected (only in classic/minimal mode if they pick the Blobby color swatch, not if the entire frame is Blobby Frame!)
+  if (frameStyle !== 'blobby' && (bgColor.includes('d7fdec') || bgColor.includes('blobby') || bgColor.includes('Blobby'))) {
     const blobbyImg = new Image();
     blobbyImg.src = blobbyFrameImg;
     await new Promise((resolve) => {
@@ -161,7 +179,7 @@ export const downloadStrip = async (photos: string[], bgColor: string, textColor
   }
 
   // Draw Text / Branding
-  ctx.fillStyle = textColor;
+  ctx.fillStyle = frameStyle === 'blobby' ? '#86198f' : textColor;
   ctx.font = 'italic bold 52px "Playfair Display", Georgia, serif';
   ctx.textAlign = 'center';
   ctx.fillText('Dapinoy', canvas.width / 2, canvas.height - 85);

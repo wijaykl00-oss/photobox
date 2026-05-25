@@ -97,7 +97,7 @@ const HantuKameraDecor = () => {
         scale: 1.1,
         rotate: [0, -4, 4, 0]
       }}
-      className="absolute bottom-6 left-6 w-24 h-24 sm:w-28 sm:h-28 cursor-pointer z-20 select-none pointer-events-auto hidden md:block"
+      className="absolute bottom-6 left-6 w-36 h-36 sm:w-44 sm:h-44 cursor-pointer z-20 select-none pointer-events-auto hidden md:block"
     >
       <img 
         src={hantuKameraImg} 
@@ -187,6 +187,7 @@ export default function App() {
   
   const [photos, setPhotos] = useState<string[]>([]);
   const [stripColor, setStripColor] = useState(STRIP_COLORS[0]);
+  const [frameStyle, setFrameStyle] = useState<'classic' | 'blobby' | 'minimal'>('classic');
   const [mode, setMode] = useState<'idle' | 'capturing' | 'review'>('idle');
   const [count, setCount] = useState<number | null>(null);
   const [flash, setFlash] = useState(false);
@@ -229,7 +230,7 @@ export default function App() {
   };
 
   const handleDownload = () => {
-    downloadStrip(photos, stripColor.hex, stripColor.text);
+    downloadStrip(photos, stripColor.hex, stripColor.text, frameStyle);
   };
 
   // Dedicated component to render the photostrip UI cleanly
@@ -241,10 +242,15 @@ export default function App() {
       className={`shadow-2xl flex flex-col mx-auto relative overflow-hidden transition-all ${
         isReviewing ? 'w-[300px] sm:w-[340px]' : 'w-[240px] sm:w-[260px]'
       }`}
-      style={{ background: stripColor.hex }}
+      style={frameStyle === 'blobby' ? {
+        backgroundImage: `url(${blobbyFrameImg})`,
+        backgroundSize: '100% 100%',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      } : { background: stripColor.hex }}
     >
-      {/* Blobby Mascot hugging the frame if isBlobby theme is chosen */}
-      {stripColor.isBlobby && (
+      {/* Blobby Mascot hugging the frame if isBlobby theme is chosen (only if not using full blobby frame style) */}
+      {frameStyle !== 'blobby' && stripColor.isBlobby && (
         <motion.img 
           src={blobbyFrameImg} 
           alt="Blobby Mascot" 
@@ -254,28 +260,32 @@ export default function App() {
         />
       )}
 
-      {/* Decorative Flowers and Leaves */}
-      {/* Top-Left Flower & Leaf */}
-      <div className="absolute top-2.5 left-2.5 flex items-center select-none pointer-events-none z-10">
-        <CuteFlower size={isReviewing ? 28 : 22} color="#ffb6c1" centerColor="#ffd700" />
-        <CuteLeaf size={isReviewing ? 18 : 14} color="#a8e6cf" className="rotate-45 -ml-1 -mt-2.5" />
-      </div>
+      {/* Decorative Flowers and Leaves (only in classic style) */}
+      {frameStyle === 'classic' && (
+        <>
+          {/* Top-Left Flower & Leaf */}
+          <div className="absolute top-2.5 left-2.5 flex items-center select-none pointer-events-none z-10">
+            <CuteFlower size={isReviewing ? 28 : 22} color="#ffb6c1" centerColor="#ffd700" />
+            <CuteLeaf size={isReviewing ? 18 : 14} color="#a8e6cf" className="rotate-45 -ml-1 -mt-2.5" />
+          </div>
 
-      {/* Top-Right Flower */}
-      <div className="absolute top-3 right-3 select-none pointer-events-none z-10">
-        <CuteFlower size={isReviewing ? 24 : 18} color="#fffdd0" centerColor="#ffb6c1" />
-      </div>
+          {/* Top-Right Flower */}
+          <div className="absolute top-3 right-3 select-none pointer-events-none z-10">
+            <CuteFlower size={isReviewing ? 24 : 18} color="#fffdd0" centerColor="#ffb6c1" />
+          </div>
 
-      {/* Left Side Flower (between photo 2 and 3) */}
-      <div className="absolute top-[48%] left-1.5 sm:left-2 -translate-y-1/2 select-none pointer-events-none z-10">
-        <CuteFlower size={isReviewing ? 22 : 16} color="#b3cde3" centerColor="#ffffff" />
-      </div>
+          {/* Left Side Flower (between photo 2 and 3) */}
+          <div className="absolute top-[48%] left-1.5 sm:left-2 -translate-y-1/2 select-none pointer-events-none z-10">
+            <CuteFlower size={isReviewing ? 22 : 16} color="#b3cde3" centerColor="#ffffff" />
+          </div>
 
-      {/* Right Side Flower & Leaf (between photo 3 and 4) */}
-      <div className="absolute top-[71%] right-2 sm:right-2.5 -translate-y-1/2 flex items-center select-none pointer-events-none z-10">
-        <CuteLeaf size={isReviewing ? 16 : 12} color="#a8e6cf" className="-rotate-45 -mr-1" />
-        <CuteFlower size={isReviewing ? 24 : 18} color="#decbe4" centerColor="#ffd700" />
-      </div>
+          {/* Right Side Flower & Leaf (between photo 3 and 4) */}
+          <div className="absolute top-[71%] right-2 sm:right-2.5 -translate-y-1/2 flex items-center select-none pointer-events-none z-10">
+            <CuteLeaf size={isReviewing ? 16 : 12} color="#a8e6cf" className="-rotate-45 -mr-1" />
+            <CuteFlower size={isReviewing ? 24 : 18} color="#decbe4" centerColor="#ffd700" />
+          </div>
+        </>
+      )}
 
       <div className={`flex flex-col relative ${isReviewing ? 'p-6 gap-4 pb-24 pt-8' : 'p-5 gap-3 pb-20 pt-6'}`}>
         {[0, 1, 2, 3].map(i => (
@@ -295,18 +305,23 @@ export default function App() {
         {/* Strip Branding */}
         <div
           className="w-full flex flex-col items-center justify-center mt-3 tracking-tight relative z-10"
-          style={{ color: stripColor.text }}
+          style={{ color: frameStyle === 'blobby' ? '#86198f' : stripColor.text }}
         >
-          {/* Left branding flower */}
-          <div className="absolute left-0 bottom-2 select-none pointer-events-none">
-            <CuteFlower size={isReviewing ? 26 : 20} color="#ffb6c1" centerColor="#ffd700" />
-          </div>
+          {/* Decorative flowers on branding (only in classic style) */}
+          {frameStyle === 'classic' && (
+            <>
+              {/* Left branding flower */}
+              <div className="absolute left-0 bottom-2 select-none pointer-events-none">
+                <CuteFlower size={isReviewing ? 26 : 20} color="#ffb6c1" centerColor="#ffd700" />
+              </div>
 
-          {/* Right branding flower & leaf */}
-          <div className="absolute right-0 bottom-2 select-none pointer-events-none flex items-center">
-            <CuteLeaf size={isReviewing ? 18 : 14} color="#a8e6cf" className="rotate-90 -mr-1.5" />
-            <CuteFlower size={isReviewing ? 22 : 16} color="#fffdd0" centerColor="#ffb6c1" />
-          </div>
+              {/* Right branding flower & leaf */}
+              <div className="absolute right-0 bottom-2 select-none pointer-events-none flex items-center">
+                <CuteLeaf size={isReviewing ? 18 : 14} color="#a8e6cf" className="rotate-90 -mr-1.5" />
+                <CuteFlower size={isReviewing ? 22 : 16} color="#fffdd0" centerColor="#ffb6c1" />
+              </div>
+            </>
+          )}
 
           <span className="font-playfair font-bold text-2xl sm:text-3xl pt-1 italic tracking-wide">Dapinoy</span>
           <span className="font-sans text-[10px] sm:text-xs opacity-60 tracking-wider mt-1 uppercase">
@@ -425,20 +440,54 @@ export default function App() {
           )}
 
           {/* Bottom Action Bar */}
-          <div className="absolute bottom-0 inset-x-0 p-6 md:p-10 flex flex-col items-center justify-center gap-6 bg-gradient-to-t from-white via-white/80 to-transparent z-20">
-            {/* Color controls shown prominently on Mobile (bottom) when idle */}
-            <div className="flex gap-3 overflow-x-auto max-w-full px-4 pb-2 md:hidden pointer-events-auto">
-              {mode === 'idle' && STRIP_COLORS.map(c => (
-                <button
-                  key={c.name}
-                  onClick={() => setStripColor(c)}
-                  style={{ background: c.hex }}
-                  className={`w-9 h-9 rounded-full shrink-0 shadow-md ring-2 ring-offset-2 ring-offset-white transition-transform ${
-                    stripColor.name === c.name ? 'ring-violet-500 scale-110' : 'ring-transparent opacity-80 hover:scale-105'
-                  }`}
-                />
-              ))}
-            </div>
+          <div className="absolute bottom-0 inset-x-0 p-6 md:p-10 flex flex-col items-center justify-center gap-4 bg-gradient-to-t from-white via-white/80 to-transparent z-20">
+            {/* Color & Frame controls shown on Mobile when idle */}
+            {mode === 'idle' && (
+              <div className="flex flex-col gap-3 w-full max-w-sm md:hidden pointer-events-auto">
+                <div className="flex gap-1 bg-white/80 p-1 rounded-full border border-slate-200/50 shadow-sm text-center">
+                  <button
+                    onClick={() => setFrameStyle('classic')}
+                    className={`flex-1 py-1.5 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                      frameStyle === 'classic' ? 'bg-violet-500 text-white' : 'text-neutral-600'
+                    }`}
+                  >
+                    🌸 Classic
+                  </button>
+                  <button
+                    onClick={() => setFrameStyle('blobby')}
+                    className={`flex-1 py-1.5 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                      frameStyle === 'blobby' ? 'bg-violet-500 text-white' : 'text-neutral-600'
+                    }`}
+                  >
+                    🍮 Blobby
+                  </button>
+                  <button
+                    onClick={() => setFrameStyle('minimal')}
+                    className={`flex-1 py-1.5 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                      frameStyle === 'minimal' ? 'bg-violet-500 text-white' : 'text-neutral-600'
+                    }`}
+                  >
+                    ✨ Minimal
+                  </button>
+                </div>
+                
+                {/* Mobile color swatches (hidden in blobby frame style) */}
+                {frameStyle !== 'blobby' && (
+                  <div className="flex gap-2 overflow-x-auto max-w-full px-2 pb-1 justify-center">
+                    {STRIP_COLORS.map(c => (
+                      <button
+                        key={c.name}
+                        onClick={() => setStripColor(c)}
+                        style={{ background: c.hex }}
+                        className={`w-8 h-8 rounded-full shrink-0 shadow-md ring-2 ring-offset-2 ring-offset-white transition-transform ${
+                          stripColor.name === c.name ? 'ring-violet-500 scale-110' : 'ring-transparent opacity-85 hover:scale-105'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="mx-auto transform-gpu pb-2 md:pb-0 pointer-events-auto">
               {mode === 'idle' && stream && (
@@ -468,24 +517,59 @@ export default function App() {
       */}
       <div className="hidden md:flex w-[380px] lg:w-[480px] bg-white/40 backdrop-blur-xl flex-col relative z-30 shadow-2xl border-l border-white/50 text-neutral-800">
         <div className="relative h-full flex flex-col p-8 z-10 w-full overflow-y-auto">
-          <div className="flex justify-between items-end mb-10 pt-2">
+          <div className="flex justify-between items-end mb-6 pt-2">
             <div>
               <h2 className="font-display font-bold text-2xl text-neutral-800">Pratinjau</h2>
-              <p className="text-neutral-500 mt-1">Pilih warna bingkai Anda</p>
+              <p className="text-neutral-500 mt-1">
+                {frameStyle === 'blobby' ? 'Tipe Bingkai: Blobby Frame' : 'Pilih warna bingkai Anda'}
+              </p>
             </div>
             {/* Color Pickers for Desktop */}
-            <div className="flex flex-wrap gap-2 max-w-[180px] justify-end pointer-events-auto">
-              {STRIP_COLORS.map(c => (
-                <button
-                  key={c.name}
-                  onClick={() => setStripColor(c)}
-                  style={{ background: c.hex }}
-                  className={`w-6 h-6 rounded-full transition-transform ring-2 ring-offset-2 ring-offset-white cursor-pointer ${
-                    stripColor.name === c.name ? 'ring-violet-500 scale-110' : 'ring-transparent opacity-80 hover:opacity-100 hover:scale-105'
-                  }`}
-                  title={c.name}
-                />
-              ))}
+            {frameStyle !== 'blobby' && (
+              <div className="flex flex-wrap gap-2 max-w-[180px] justify-end pointer-events-auto">
+                {STRIP_COLORS.map(c => (
+                  <button
+                    key={c.name}
+                    onClick={() => setStripColor(c)}
+                    style={{ background: c.hex }}
+                    className={`w-6 h-6 rounded-full transition-transform ring-2 ring-offset-2 ring-offset-white cursor-pointer ${
+                      stripColor.name === c.name ? 'ring-violet-500 scale-110' : 'ring-transparent opacity-85 hover:opacity-100 hover:scale-105'
+                    }`}
+                    title={c.name}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Frame Style Selector */}
+          <div className="mb-8 pointer-events-auto">
+            <h3 className="font-sans font-semibold text-xs text-neutral-400 uppercase tracking-wider mb-2">Tipe Bingkai</h3>
+            <div className="flex gap-1.5 bg-slate-200/50 p-1 rounded-full border border-slate-200/30 text-center">
+              <button
+                onClick={() => setFrameStyle('classic')}
+                className={`flex-1 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                  frameStyle === 'classic' ? 'bg-violet-500 text-white shadow-sm' : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+              >
+                🌸 Classic
+              </button>
+              <button
+                onClick={() => setFrameStyle('blobby')}
+                className={`flex-1 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                  frameStyle === 'blobby' ? 'bg-violet-500 text-white shadow-sm' : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+              >
+                🍮 Blobby Frame
+              </button>
+              <button
+                onClick={() => setFrameStyle('minimal')}
+                className={`flex-1 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                  frameStyle === 'minimal' ? 'bg-violet-500 text-white shadow-sm' : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+              >
+                ✨ Minimal
+              </button>
             </div>
           </div>
 
