@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useCamera } from './hooks/useCamera';
 import { downloadStrip } from './utils/canvas';
 import hantuKameraImg from '@/item/Hantukamera.png';
-import blobbyFrameImg from '@/item/bingkai1.png';
+import blobbyFrameImg from '@/item/The Blobby Frame.png';
 
 const STRIP_COLORS = [
   { name: 'Dark', hex: '#18181b', text: '#ffffff' },
@@ -257,10 +257,10 @@ export default function App() {
       animate={{ opacity: 1, y: 0 }}
       className={`shadow-2xl flex flex-col mx-auto relative overflow-hidden transition-all ${
         frameStyle === 'blobby'
-          ? (isReviewing ? 'w-[340px] sm:w-[380px] aspect-[5/12]' : 'w-[270px] sm:w-[290px] aspect-[5/12]')
+          ? (isReviewing ? 'w-[320px] sm:w-[360px]' : 'w-[250px] sm:w-[270px]')
           : (isReviewing ? 'w-[300px] sm:w-[340px]' : 'w-[240px] sm:w-[260px]')
       }`}
-      style={{ background: frameStyle === 'blobby' ? 'transparent' : stripColor.hex }}
+      style={{ background: stripColor.hex }}
     >
       {/* Blobby Mascot hugging the frame if isBlobby theme is chosen (only if not using full blobby frame style) */}
       {frameStyle !== 'blobby' && stripColor.isBlobby && (
@@ -300,78 +300,69 @@ export default function App() {
         </>
       )}
 
-      {frameStyle === 'blobby' ? (
-        <div className="absolute inset-0 w-full h-full z-0">
-          {/* The two photo slots positioned absolutely behind the template's transparent frame slots */}
-          {[0, 1].map(i => (
-            <div 
-              key={i} 
-              className="absolute left-[11%] w-[78%] h-[32%] overflow-hidden rounded-[20px] bg-slate-900/40 z-0 border border-white/5"
-              style={{
-                top: i === 0 ? '7%' : '47.6%'
-              }}
-            >
+      <div className={`flex flex-col relative transition-all ${
+        frameStyle === 'blobby'
+          ? (isReviewing ? 'p-8 sm:p-9 gap-6 pb-26 pt-9' : 'p-6 gap-5 pb-20 pt-7')
+          : (isReviewing ? 'p-6 gap-4 pb-24 pt-8' : 'p-5 gap-3 pb-20 pt-6')
+      }`}>
+        {(frameStyle === 'blobby' ? [0, 1] : [0, 1, 2, 3]).map(i => (
+          <div 
+            key={i} 
+            className={`w-full aspect-[4/3] relative ${
+              frameStyle === 'blobby' ? 'p-2 sm:p-2.5 z-0' : 'bg-black/10 rounded overflow-hidden border border-black/5 z-0'
+            }`}
+          >
+            {/* The photo, rounded at the corners underneath the Blobby Frame */}
+            <div className="w-full h-full overflow-hidden rounded-[8px]">
               {photos[i] ? (
                 <img src={photos[i]} alt={`Shot ${i+1}`} className="w-full h-full object-cover" />
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center font-display font-bold text-xl text-neutral-400 bg-neutral-900/60">
+                <div className={`absolute inset-0 flex items-center justify-center font-medium ${
+                  frameStyle === 'blobby' ? 'text-neutral-400 bg-neutral-200/50' : 'text-black/20'
+                }`}>
                   {i + 1}
                 </div>
               )}
             </div>
-          ))}
 
-          {/* The full-bleed bingkai1.png template overlaying the whole strip */}
-          <img 
-            src={blobbyFrameImg} 
-            alt="Blobby Frame Template" 
-            className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-10 filter drop-shadow-md" 
-          />
+            {/* Blobby Frame overlaying the photo box */}
+            {frameStyle === 'blobby' && (
+              <img 
+                src={blobbyFrameImg} 
+                alt="Blobby Frame" 
+                className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-10 scale-[1.18] filter drop-shadow-sm" 
+              />
+            )}
+          </div>
+        ))}
+      </div>
 
-          {/* Cute micro-date printed on the pink space beneath the branding */}
-          <span 
-            className="absolute bottom-[2.5%] inset-x-0 text-center font-sans font-bold text-[8px] sm:text-[10px] tracking-widest uppercase z-20 pointer-events-none select-none"
-            style={{ color: '#86198f', opacity: 0.6 }}
-          >
-            {new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
-          </span>
-        </div>
-      ) : (
-        /* Classic / Minimal styles with 4 photo slots */
-        <div className={`flex flex-col relative transition-all ${
-          isReviewing ? 'p-6 gap-4 pb-24 pt-8' : 'p-5 gap-3 pb-20 pt-6'
-        }`}>
-          {[0, 1, 2, 3].map(i => (
-            <div 
-              key={i} 
-              className="w-full aspect-[4/3] relative bg-black/10 rounded overflow-hidden border border-black/5 z-0"
-            >
-              <div className="w-full h-full overflow-hidden rounded-[8px]">
-                {photos[i] ? (
-                  <img src={photos[i]} alt={`Shot ${i+1}`} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center font-medium text-black/20">
-                    {i + 1}
-                  </div>
-                )}
-              </div>
+      {/* HTML Branding - Rendered at the bottom of the strip */}
+      <div
+        className="w-full flex flex-col items-center justify-center mt-3 tracking-tight relative z-10 pb-6 shrink-0"
+        style={{ color: frameStyle === 'blobby' ? '#86198f' : stripColor.text }}
+      >
+        {/* Decorative flowers on branding (only in classic style) */}
+        {frameStyle === 'classic' && (
+          <>
+            {/* Left branding flower */}
+            <div className="absolute left-0 bottom-2 select-none pointer-events-none">
+              <CuteFlower size={isReviewing ? 26 : 20} color="#ffb6c1" centerColor="#ffd700" />
             </div>
-          ))}
-        </div>
-      )}
 
-      {/* HTML Branding - Only rendered for classic and minimal styles */}
-      {frameStyle !== 'blobby' && (
-        <div
-          className="w-full flex flex-col items-center justify-center mt-3 tracking-tight relative z-10 pb-6 shrink-0"
-          style={{ color: stripColor.text }}
-        >
-          <span className="font-playfair font-bold text-2xl sm:text-3xl pt-1 italic tracking-wide">Dapinoy</span>
-          <span className="font-sans text-[10px] sm:text-xs opacity-60 tracking-wider mt-1 uppercase">
-            {new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
-          </span>
-        </div>
-      )}
+            {/* Right branding flower & leaf */}
+            <div className="absolute right-0 bottom-2 select-none pointer-events-none flex items-center">
+              <CuteLeaf size={isReviewing ? 18 : 14} color="#a8e6cf" className="rotate-90 -mr-1.5" />
+              <CuteFlower size={isReviewing ? 22 : 16} color="#fffdd0" centerColor="#ffb6c1" />
+            </div>
+          </>
+        )}
+
+        <span className="font-playfair font-bold text-2xl sm:text-3xl pt-1 italic tracking-wide">Dapinoy</span>
+        <span className="font-sans text-[10px] sm:text-xs opacity-60 tracking-wider mt-1 uppercase">
+          {new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
+        </span>
+      </div>
     </motion.div>
   );
 
