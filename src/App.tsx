@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useCamera } from './hooks/useCamera';
 import { downloadStrip } from './utils/canvas';
 import hantuKameraImg from '@/item/Hantukamera.png';
-import blobbyFrameImg from '@/item/The Blobby Frame.png';
+import blobbyFrameImg from '@/item/bingkai1.png';
 
 const STRIP_COLORS = [
   { name: 'Dark', hex: '#18181b', text: '#ffffff' },

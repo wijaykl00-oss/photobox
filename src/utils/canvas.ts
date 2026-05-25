@@ -1,4 +1,4 @@
-import blobbyFrameImg from '@/item/The Blobby Frame.png';
+import blobbyFrameImg from '@/item/bingkai1.png';
 
 const drawFlower = (
   ctx: CanvasRenderingContext2D,
