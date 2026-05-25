@@ -302,7 +302,7 @@ export default function App() {
 
       <div className={`flex flex-col relative transition-all ${
         frameStyle === 'blobby'
-          ? (isReviewing ? 'px-14 py-10 gap-7 pb-28 pt-12' : 'px-11 py-8 gap-6 pb-22 pt-10')
+          ? (isReviewing ? 'px-18 py-14 gap-8 pb-32 pt-16' : 'px-14 py-10 gap-7 pb-24 pt-12')
           : (isReviewing ? 'p-6 gap-4 pb-24 pt-8' : 'p-5 gap-3 pb-20 pt-6')
       }`}>
         {(frameStyle === 'blobby' ? [0, 1] : [0, 1, 2, 3]).map(i => (
@@ -330,7 +330,7 @@ export default function App() {
               <img 
                 src={blobbyFrameImg} 
                 alt="Blobby Frame" 
-                className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-10 scale-[1.46] filter drop-shadow-sm" 
+                className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-10 scale-[2] filter drop-shadow-sm" 
               />
             )}
           </div>
